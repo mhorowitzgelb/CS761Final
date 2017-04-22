@@ -1,0 +1,86 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{color}
+
+\begin{document}
+\section*{Modified Teaching environment}
+We will solve a more relaxed problem such that the teacher may not only give $(x,y)$ training examples but may also give single $x$ values to probe the learner for output. 
+
+\section*{Theorem 1}
+If given a perceptron with known starting parameter $w_0$, desired parameter $w^*$, and unknown learning rate $\eta \in [\alpha , \beta]$ for given $\epsilon > 0$, we can guarantee $\eta \in [\alpha', \beta']$ such that $\beta' - \alpha' \leq \epsilon$ using $1 + \lceil \log_2(\frac{\beta - \alpha}{\epsilon})\rceil$
+
+\subsection*{Proof:}
+Assume $w_0 \neq cw^*$ for arbitrary $c > 0$, then there exists an $(x_1, y_1)$ such that $\text{sign}(\langle w^*,x_1 \rangle) = y_1 = 1$ and $\text{sign}(\langle w_0,x_1 \rangle) = -y_1$.
+\color{red}
+I don't think that its hard to show this is true.
+\color{black}
+
+Then give $(x_1, y_1)$ to the learner and then after training update,
+$$
+w_1 = w_0 + \eta* x_1
+$$
+
+Then grab an unlabeled $x_2$ such that
+$\langle w_0,x_2 \rangle \neq 0$, $\langle x_1, x_2 \rangle \neq 0$
+and 
+$$
+\langle w_0,x_2 \rangle + \frac{\beta - \alpha}{2} \langle x_1, x_2 \rangle = 0
+$$
+\color{red}
+I'm a moron. What's the closed form of this? I know there is not a unique solution. We just need the simplest one.
+\color{black}
+
+Then probe the learner with $x_2$. If the learner outputs $+1$ then
+$\eta \in (\frac{\beta - \alpha}{2} , \beta]$, else 
+$\eta \in [\alpha,\frac{\beta - \alpha}{2}]$
+
+As you can see our interval for $\eta$ halves with each probe. One can then see that we can iteratively repeat this for a total of $ \lceil \log_2(\frac{\beta - \alpha}{\epsilon})\rceil$ iterations to aquire the desired interval length on $\eta$.
+
+
+\section*{Theorem 2}
+\color{red}
+
+Something to the respect of, if we know $\eta \in [\alpha, \beta]$ then with one training example we can guarantee that
+$$
+\frac{\langle w^*, w_0 \rangle}{\lvert w^* \rvert \lvert w_0 \rvert} \geq 1 - \epsilon
+$$
+
+So by combining with Theorem 1
+$$
+T_\epsilon \leq \{\text{number of points needed to guarantee } \eta \in [\alpha, \beta]\} +1 
+$$
+Where $T_\epsilon$ is the $\epsilon$ teaching dimension of the perceptron.
+\color{black}
+
+\subsection*{Proof}
+
+\color{red}
+Assume we now $w_1$
+and $\eta_{min} \leq \eta \leq \eta_{max}$
+
+and there is an $(x_2,y_2)$ such that $y_2 = 1$ and agrees with $w^*$ and not $w_1$. For some $c$ similar to orignal proof
+let 
+$$
+x_2 = \frac{cw^* - w_1}{\beta}
+$$ 
+
+note 
+$$
+\frac{\alpha}{\alpha + \beta - \alpha}\leq \frac{\eta}{\beta}  \leq 1
+$$
+
+so
+$$
+w_1 + \eta x_2 = cw^* - \epsilon
+$$
+where
+$
+0 \leq \epsilon \leq (cw* - w_1) * \frac{\beta - \alpha}{\alpha + \beta - \alpha}  \leq \frac{\beta - \alpha}{\eta_{min} + \beta - \alpha} \leq \frac{\beta - \alpha}{\eta_{min}}
+$
+
+\color{red}
+
+
+
+\end{document}
