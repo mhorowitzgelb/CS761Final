@@ -2,13 +2,17 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{color}
+\usepackage{parskip}
+
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
 
 \begin{document}
 \section*{Modified Teaching environment}
 We will solve a more relaxed problem such that the teacher may not only give $(x,y)$ training examples but may also give single $x$ values to probe the learner for output. 
 
 \section*{Theorem 1}
-If given a perceptron with known starting parameter $w_0$, desired parameter $w^*$, and unknown learning rate $\eta \in [\alpha , \beta]$ for given $\epsilon > 0$, we can guarantee $\eta \in [\alpha', \beta']$ such that $\beta' - \alpha' \leq \epsilon$ using $1 + \lceil \log_2(\frac{\beta - \alpha}{\epsilon})\rceil$
+If given a perceptron with known starting parameter $w_0$, desired parameter $w^*$, and unknown learning rate $\eta \in [\alpha , \beta]$ for given $\epsilon > 0$, we can guarantee $\eta \in [\alpha', \beta']$ such that $\beta' - \alpha' \leq \epsilon$ using $1 + \lceil \log_2(\frac{\beta - \alpha}{\epsilon})\rceil$ examples.=
 
 \subsection*{Proof:}
 Assume $w_0 \neq cw^*$ for arbitrary $c > 0$, then there exists an $(x_1, y_1)$ such that $\text{sign}(\langle w^*,x_1 \rangle) = y_1 = 1$ and $\text{sign}(\langle w_0,x_1 \rangle) = -y_1$.
@@ -55,31 +59,48 @@ Where $T_\epsilon$ is the $\epsilon$ teaching dimension of the perceptron.
 
 \subsection*{Proof}
 
-\color{red}
-Assume we now $w_1$
-and $\eta_{min} \leq \eta \leq \eta_{max}$
 
-and there is an $(x_2,y_2)$ such that $y_2 = 1$ and agrees with $w^*$ and not $w_1$. For some $c$ similar to orignal proof
-let 
-$$
-x_2 = \frac{cw^* - w_1}{\beta}
-$$ 
+Assume $w_0$ is known and $\eta \in [\eta_{\min} , \eta_{\max}] $ such that 
+$0 < \eta_{\min} < \eta_{\max} < \infty$
 
-note 
-$$
-\frac{\alpha}{\alpha + \beta - \alpha}\leq \frac{\eta}{\beta}  \leq 1
-$$
+Assume WLOG $\lVert w^* \rVert = 1$.
 
-so
-$$
-w_1 + \eta x_2 = cw^* - \epsilon
-$$
-where
-$
-0 \leq \epsilon \leq (cw* - w_1) * \frac{\beta - \alpha}{\alpha + \beta - \alpha}  \leq \frac{\beta - \alpha}{\eta_{min} + \beta - \alpha} \leq \frac{\beta - \alpha}{\eta_{min}}
-$
+Pick $(x_1,y_1)$ such that $y_1 = -1$, $\lVert x_1 \rVert = \frac{2 \lVert w_0 \rVert}{\epsilon \eta_{\min}}$
 
 \color{red}
+Note when i say $y_1 = 1$, that implies that it agrees with $w^*$. And I'm pretty 
+sure the above statement is valid. I think such an $x,y$ pair will always exist if
+$w_0$ disagrees with $w^*$.
+\color{black}
+
+Then use the method from Theorem 1 to get a bound on $\eta$ such that $\eta \in [\alpha , \beta]$ and $\beta - \alpha <= ?$
+
+Then let $x_2 = \frac{2 \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2}w^* + x_1$.
+It should be clear that then $y_2 = 1$
+
+Then realize that
+$w_1 = w_0 - \eta x_1$
+
+So
+$$
+y_2 \langle w_1, x_2 \rangle  = \bigg\langle \frac{2 \lVert w_0 \rVert}{\epsilon (\beta + \alpha) /2} w^* + x_1 , w_0 - \eta x_1 \bigg\rangle
+$$
+$$
+= \bigg\langle \frac{2 \lVert w_0 \rVert}{\epsilon (\beta + \alpha) /2} w^* + x_1 , w_0  \bigg\rangle - \eta \lVert x_1 \rVert^2
+$$
+$$
+\leq \bigg( \frac{2 \lVert w_0 \rVert}{\epsilon (\beta + \alpha) /2} \lVert w^* \rVert + \lVert x_1 \rVert \bigg ) \lVert w_0 \rVert - \eta \lVert x_1 \rVert^2
+$$
+$$
+= \frac{4 \lVert w_0 \rVert^2}{\epsilon (\beta + \alpha)/2} - \eta \frac{4 \lVert w_0 \rVert^2}{\epsilon^2 \eta_{\min}^2}
+$$
+$$
+\leq \frac{4 \lVert w_0 \rVert^2}{\epsilon (\beta + \alpha)/2} -  \frac{4 \lVert w_0 \rVert^2}{\epsilon^2 \eta_{\min}}
+$$
+which is less than $0$ for $epsilon < 1$
+
+
+
 
 
 
