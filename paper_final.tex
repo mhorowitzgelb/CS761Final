@@ -13,6 +13,9 @@
 \usepackage{algorithmic}
 \usepackage{bbm}
 \usepackage{parskip}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{color}
 
 \setlength{\parskip}{5pt}
 \setlength{\parindent}{0pt}
@@ -25,6 +28,9 @@
   Department of Computer Sciences, University of Wisconsin-Madison\\
   \texttt{\{horowitzgelb, ferns\}@wisc.edu}\\
 }
+
+\newcommand{\learn}{\mathcal{A}_{w_0}^\eta}
+
 
 \begin{document}
 % \nipsfinalcopy is no longer used
@@ -58,9 +64,102 @@ As one can see, knowledge of $w_0$ and $\eta$ are critical to being able to teac
 
 
 \section{Teaching Dimension}
+\cite{perceptron} used two metrics when analyzing their teaching strategies. The first was the exact 
+teaching dimension. The exact teaching dimension is the length of the shortest training sequence that 
+teaches a learner the desired concept. 
 
+\subsection{$TD_{exact}$}
 
+Formally, let $\mathbb{S}$ be the space of finite training 
+sequences. Then let $\mathcal{A}_{w_0}^{\eta} : \mathbb{S} \to \mathbb{R}^d$ be a function the gives the 
+resultant weight vector after training on a sequence in $\mathbb{S}$, where $w_0$ is the initial weight 
+vector, and $\eta$ is the learning rate. Then if the teacher which to teach a concept $w^*$, then since $w^*$ describes a linear decision boundary then for any $c > 0$, $cw^*$ is parameterizes the same concept as $w^*$
+so the exact teaching dimension is 
+$$
+TD_{exact}(w^*, \mathcal{A}_{w_0}^\eta) = \min\{ \lvert S \rvert : 
+\mathcal{A}_{w_0}^\eta(S) = cw^* \text{ for some } c >0 \}
+$$
 
+\cite{perceptron} showed that when $\eta$ and $w_0$ where known, $TD_{exact}(w^*, \mathcal{A}_{w_0}^\eta) = 1$
+
+\subsection{$TD_\epsilon$}
+\cite{perceptron} also defined an approximate teaching dimension for cases where the exact teaching dimension was infinite but one could approximately teach a concept within $\epsilon$ distance. For perceptrons, the distance metric used was simply the 1 minus the cosine angle between $w^*$ 
+and $\learn(S)$
+$$
+1 -\frac{\langle \learn(S), w^* \rangle}{\lVert \learn(s) \rVert \lVert w^* \rVert} \leq \epsilon
+$$
+
+Then let $\mathbb{T}_\epsilon$ be the set of $\epsilon-\text{approximate}$ teaching strategies for a decision boundary $w^*$. Then
+$$
+TD_\epsilon(w^*, \learn) = \min_{t \in 
+\mathbb{T}_\epsilon} \max_{w_0 \in 
+\mathbb{R}^d} \lvert t(w_0) \rvert
+$$
+
+\cite{perceptron} showed that when $w_0$ was unknown but $\eta$ was known $TD_\epsilon(w^*, \learn) = 3$
+
+\section{Approximate Teaching with Unkown $\eta$}
+Now we look at the scenario where the initial weight vector is known but the learning rate is unknown and bounded.
+
+\subsection{Using Unlabeled Examples}
+Before the teaching dimension was only analyzed with labeled examples. Here we relax this constraint and allow unlabeled examples to be used in the teaching sequence. Now we redefine $\mathbb{S}$ to be the set of all sequences of labeled and unlabeled examples. And for any $S \in \mathbb{S}$
+$$
+\learn(S) = \learn(S \setminus \{s \in S : s = (x, ?)\} )
+$$
+
+\subsection{Algorithm for bounding $\eta$}
+With the ability to teach with unlabeled examples, below shows the optimal algorithm for bounding $\eta$ within a desired length, under the conditions that $\eta$ is bounded and $w_0$ is known a priori.
+
+\begin{algorithm}
+\caption{Bounding $\eta$ within $\epsilon$ }
+\begin{algorithmic}[1]
+	\REQUIRE $\epsilon$ , lower bound $\eta_{\min} > 0$, upper bound $\eta_{\max} < \infty$ and $w^*$
+	\STATE Select $(x_1 , y_1)$ s.t. $sign(\langle w^* , x_1 \rangle) = y_1 = 1 = 
+	-sign(\langle w_0 , x_1 \rangle )$
+	\STATE Give $(x_1, y_1)$ to the perceptron and allow to update.
+	\STATE $\alpha \leftarrow \eta_{\min}$
+	\STATE $\beta \leftarrow \eta_{\max}$
+	
+	\WHILE{$\beta - \alpha > \epsilon$}
+		\STATE Select $ x_2$ s.t. $\langle w_0 , x_2 \rangle \neq 0, \langle x_1 , x_2 \rangle \neq 0$ and $\langle w_0, x_2 \rangle \frac{\beta - \alpha}{2}\langle x_1, x_2 \rangle = 0$
+		\STATE Let the perceptron predict $\hat{y}$ for $x_2$
+		\IF{$\hat{y} = 1$}
+			\STATE $ \alpha \leftarrow \frac{\beta - \alpha}{2}$ 		
+		\ELSE
+			\STATE $ \beta \leftarrow \frac{\beta - \alpha}{2}$ 
+		\ENDIF	
+	\ENDWHILE   
+	\RETURN $(\alpha , \beta)$
+\end{algorithmic}
+\end{algorithm} 
+
+\section*{Theorem 1}
+If given a perceptron with known starting parameter $w_0$, desired parameter $w^*$, and unknown learning rate $\eta \in [\alpha , \beta]$ for given $\epsilon > 0$, we can guarantee $\eta \in [\alpha', \beta']$ such that $\beta' - \alpha' \leq \epsilon$ using $1 + \lceil \log_2(\frac{\beta - \alpha}{\epsilon})\rceil$ examples.=
+
+\subsection*{Proof:}
+Assume $w_0 \neq cw^*$ for arbitrary $c > 0$, then there exists an $(x_1, y_1)$ such that $\text{sign}(\langle w^*,x_1 \rangle) = y_1 = 1$ and $\text{sign}(\langle w_0,x_1 \rangle) = -y_1$.
+\color{red}
+I don't think that its hard to show this is true.
+\color{black}
+
+Then give $(x_1, y_1)$ to the learner and then after training update,
+$$
+w_1 = w_0 + \eta* x_1
+$$
+
+Then grab an unlabeled $x_2$ such that
+$\langle w_0,x_2 \rangle \neq 0$, $\langle x_1, x_2 \rangle \neq 0$
+and 
+$$
+\langle w_0,x_2 \rangle + \frac{\beta - \alpha}{2} \langle x_1, x_2 \rangle = 0
+$$
+\color{red}
+I'm a moron. What's the closed form of this? I know there is not a unique solution. We just need the simplest one.
+\color{black}
+
+Then probe the learner with $x_2$. If the learner outputs $+1$ then
+$\eta \in (\frac{\beta - \alpha}{2} , \beta]$, else 
+$\eta \in [\alpha,\frac{\beta - \alpha}{2}]$
 
 \section*{References}
 
