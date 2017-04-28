@@ -133,33 +133,116 @@ With the ability to teach with unlabeled examples, below shows the optimal algor
 \end{algorithmic}
 \end{algorithm} 
 
-\section*{Theorem 1}
-If given a perceptron with known starting parameter $w_0$, desired parameter $w^*$, and unknown learning rate $\eta \in [\alpha , \beta]$ for given $\epsilon > 0$, we can guarantee $\eta \in [\alpha', \beta']$ such that $\beta' - \alpha' \leq \epsilon$ using $1 + \lceil \log_2(\frac{\beta - \alpha}{\epsilon})\rceil$ examples.=
+\textbf{Theorem 1.}
+\textit{
+If given a perceptron with known starting parameter $w_0$, desired parameter $w^*$, and unknown 
+learning rate $\eta \in [\eta_{\min} , \eta_{\max}]$, then for given $\epsilon > 0$, \textbf{Algorithm 2} can guarantee $\eta \in 
+[\alpha, \beta]$ such that $\beta - \alpha \leq \epsilon$ using $1 + \lceil \log_2(\frac{\eta_
+{\min} - \eta_{\max}}{\epsilon})\rceil$ examples.}
 
-\subsection*{Proof:}
+\textit{Proof.}
 Assume $w_0 \neq cw^*$ for arbitrary $c > 0$, then there exists an $(x_1, y_1)$ such that $\text{sign}(\langle w^*,x_1 \rangle) = y_1 = 1$ and $\text{sign}(\langle w_0,x_1 \rangle) = -y_1$.
 \color{red}
-I don't think that its hard to show this is true.
+I don't think that its hard to show this is true. But I won't prove for now
 \color{black}
 
 Then give $(x_1, y_1)$ to the learner and then after training update,
 $$
-w_1 = w_0 + \eta* x_1
+w_1 = w_0 + \eta x_1
 $$
 
 Then grab an unlabeled $x_2$ such that
 $\langle w_0,x_2 \rangle \neq 0$, $\langle x_1, x_2 \rangle \neq 0$
 and 
 $$
-\langle w_0,x_2 \rangle + \frac{\beta - \alpha}{2} \langle x_1, x_2 \rangle = 0
+\langle w_0,x_2 \rangle + \frac{\eta_{\max} - \eta_{\min}}{2} \langle x_1, x_2 \rangle = 0
 $$
 \color{red}
-I'm a moron. What's the closed form of this? I know there is not a unique solution. We just need the simplest one.
+There should always be at least one solution to this. Again I won't prove for now.
 \color{black}
 
+
 Then probe the learner with $x_2$. If the learner outputs $+1$ then
-$\eta \in (\frac{\beta - \alpha}{2} , \beta]$, else 
-$\eta \in [\alpha,\frac{\beta - \alpha}{2}]$
+$\eta \in (\frac{\eta_{\max} - \eta_{\min}}{2} , \eta_{\max}]$, else 
+$\eta \in [\eta_{\min},\frac{\eta_{\max} - \eta_{\min}}{2}]$
+
+After the first labeled example , the length of the bound on $\eta$ is halved which each unlabeled example given. So one can see that with $n + 1$ examples the length of the bound on $\eta$ is $\frac{\eta_{\max} - \eta_{\min}}{2 ^ n }$. So to achieve a bound length of $\epsilon$ one needs
+$ 1 + \lceil \log_2 ( \frac{\eta_
+{\min} - \eta_{\max}}{\epsilon} ) \rceil$ examples.
+
+\subsection{Teaching Dimension for Unknown $\eta$}
+
+\textbf{Theorem 2.}
+\textit{ If $w_0$ is known and $ 0 < \eta_{\min} \leq \eta \leq \eta_{\max} < \infty$ 
+then $\mathbb{T}_{\epsilon}(w^*, \learn)  \leq 2 + \lceil \log_2 \frac{\eta_{\max} - \eta_{\min}}{2\epsilon\eta_{\max}}  \rceil$
+}
+\\
+\\
+\\
+\textit{Proof.}
+Assume WLOG $\lVert w^* \rVert = 1$.
+
+Pick $(x_1,y_1)$ such that $y_1 = -1$, $\lVert x_1 \rVert = \frac{2 \lVert w_0 \rVert}{\epsilon \eta_{\min}}$ and $\langle x_1 , w^* \rangle = 0$.
+
+Use this $(x_1, y_1)$ in \textbf{Algorithm 2} to get a bound on $\eta$ such that $\eta \in [\alpha , \beta]$ and $\beta - \alpha <= 2\epsilon \eta_{\max}$
+
+Then let $x_2 = \frac{2 \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2}w^* + x_1$.
+It should be clear that then that $sign(\langle w* , x_2 \rangle) =  y_2 = 1$
+
+Then realize that
+$w_1 = w_0 - \eta x_1$
+
+So
+$$
+y_2 \langle w_1, x_2 \rangle  = \bigg\langle \frac{2 \lVert w_0 \rVert}{\epsilon (\beta + \alpha) /2} w^* + x_1 , w_0 - \eta x_1 \bigg\rangle
+$$
+$$
+= \bigg\langle \frac{2 \lVert w_0 \rVert}{\epsilon (\beta + \alpha) /2} w^* + x_1 , w_0  \bigg\rangle - \eta \lVert x_1 \rVert^2
+$$
+$$
+\leq \bigg( \frac{2 \lVert w_0 \rVert}{\epsilon (\beta + \alpha) /2} \lVert w^* \rVert + \lVert x_1 \rVert \bigg ) \lVert w_0 \rVert - \eta \lVert x_1 \rVert^2
+$$
+$$
+= \frac{2 \lVert w_0 \rVert^2}{\epsilon (\beta + \alpha)/2} + \frac{2 \lVert w_0 \rVert ^2}{\epsilon \eta_{\min}} - \eta \frac{4 \lVert w_0 \rVert^2}{\epsilon^2 \eta_{\min}^2}
+$$
+$$
+\leq \frac{4 \lVert w_0 \rVert^2}{\epsilon (\beta + \alpha)/2}  -  \frac{4 \lVert w_0 \rVert^2}{\epsilon^2 \eta_{\min}}
+$$
+which is less than $0$ for $\epsilon < 1$, so $(x_2 , y_2)$ will cause the perceptron to update.
+
+Then,
+notice that $w_2 = w_0 +\eta \frac{2  \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2} w^*$
+
+Then 
+$$
+\frac{\langle w_2, w^* \rangle}{\lVert w_1 \rVert \lVert w^* \rVert} = \frac{
+\frac{\eta 2  \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2} \lVert w^* \lVert ^2 + \langle w_0, w^* \rangle}{\lVert w_2 \rVert}
+$$ 
+$$
+\geq \frac{\frac{\eta 2  \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2} - \lVert w_0 \rVert}{\lVert w_0 \rVert +\frac{\eta 2  \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2} }
+$$
+$$
+= 1 - \frac{2 \lVert w_0  \rVert}{\lVert w_0 \rVert +\frac{\eta 2  \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2} }
+$$
+$$
+= 1 - \frac{2\lVert w_0 \rVert}{\lVert w_0  \rVert \epsilon + \frac{\eta 2  \lVert w_0 \rVert}{(\beta + \alpha)/2} } \epsilon
+$$
+$$
+\geq  1 - \frac{2\lVert w_0 \rVert}{\lVert w_0  \rVert \epsilon + \frac{\eta 2  \lVert w_0 \rVert}{\eta_{\max} - (\beta - \alpha) / 2} } \epsilon
+$$
+$$
+\geq  1 - \frac{2\lVert w_0 \rVert}{\lVert w_0  \rVert \epsilon + \frac{\eta 2  \lVert w_0 \rVert}{\eta_{\max} (1-\epsilon)} } \epsilon
+$$
+$$
+\geq 1 - \frac{2\lVert w_0 \rVert}{\lVert w_0  \rVert \epsilon + \frac{ 2  \lVert w_0 \rVert}{(1-\epsilon)} } \epsilon
+$$
+$$
+\geq 1 - \epsilon
+$$
+
+Therefore 
+$T_\epsilon \leq  2 + \lceil \log_2 \frac{\eta_{\max} - \eta_{\min}}{2\epsilon\eta_{\max}}  \rceil$
+
 
 \section*{References}
 
