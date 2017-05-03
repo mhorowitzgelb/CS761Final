@@ -1,4 +1,4 @@
-\documentclass{article}
+   \documentclass{article}
 
 \usepackage[utf8]{inputenc} % allow utf-8 input
 \usepackage[T1]{fontenc}    % use 8-bit T1 fonts
@@ -6,17 +6,14 @@
 \usepackage{url}            % simple URL typesetting
 \usepackage{booktabs}       % professional-quality tables
 \usepackage{amsfonts}       % blackboard math symbols
-\usepackage{nicefrac}       % compact symbols for 1/2, etc.
-\usepackage{microtype}      % microtypography
 \usepackage{algorithm}
 \usepackage{algorithmic}
-\usepackage{bbm}
-\usepackage{parskip}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{color}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\usepackage{bbm}
 
 \setlength{\parskip}{5pt}
 \setlength{\parindent}{0pt}
@@ -31,6 +28,7 @@
 }
 
 \newcommand{\learn}{\mathcal{A}_{w_0}^\eta}
+\newcommand{\radian}{\text{radian}}
 
 
 \begin{document}
@@ -174,7 +172,7 @@ $ 1 + \lceil \log_2 ( \frac{\eta_
 \subsection{Teaching Dimension for Unknown $\eta$}
 
 \textbf{Theorem 2.}
-\textit{ If $w_0$ is known and $ 0 < \eta_{\min} \leq \eta \leq \eta_{\max} < \infty$ 
+\textit{ If $w_0$ is known , $w_0 \leq b < \infty$ and $ 0 < \eta_{\min} \leq \eta \leq \eta_{\max} < \infty$ 
 then $\mathbb{T}_{\epsilon}(w^*, \learn)  \leq 2 + \lceil \log_2 \frac{\eta_{\max} - \eta_{\min}}{2\epsilon\eta_{\max}}  \rceil$
 }
 \\
@@ -183,11 +181,11 @@ then $\mathbb{T}_{\epsilon}(w^*, \learn)  \leq 2 + \lceil \log_2 \frac{\eta_{\ma
 \textit{Proof.}
 Assume WLOG $\lVert w^* \rVert = 1$.
 
-Pick $(x_1,y_1)$ such that $y_1 = -1$, $\lVert x_1 \rVert = \frac{2 \lVert w_0 \rVert}{\epsilon \eta_{\min}}$ and $\langle x_1 , w^* \rangle = 0$.
+Pick $(x_1,y_1)$ such that $y_1 = -1$, $\lVert x_1 \rVert = \frac{2 b}{\epsilon \eta_{\min}}$ and $\langle x_1 , w^* \rangle = 0$.
 
 Use this $(x_1, y_1)$ in \textbf{Algorithm 2} to get a bound on $\eta$ such that $\eta \in [\alpha , \beta]$ and $\beta - \alpha <= 2\epsilon \eta_{\max}$
 
-Then let $x_2 = \frac{2 \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2}w^* + x_1$.
+Then let $x_2 = \frac{2 b}{\epsilon (\beta + \alpha)/2}w^* + x_1$.
 It should be clear that then that $sign(\langle w* , x_2 \rangle) =  y_2 = 1$
 
 Then realize that
@@ -195,55 +193,159 @@ $w_1 = w_0 - \eta x_1$
 
 So
 $$
-y_2 \langle w_1, x_2 \rangle  = \bigg\langle \frac{2 \lVert w_0 \rVert}{\epsilon (\beta + \alpha) /2} w^* + x_1 , w_0 - \eta x_1 \bigg\rangle
+y_2 \langle w_1, x_2 \rangle  = \bigg\langle \frac{2 b}{\epsilon (\beta + \alpha) /2} w^* + x_1 , w_0 - \eta x_1 \bigg\rangle
 $$
 $$
-= \bigg\langle \frac{2 \lVert w_0 \rVert}{\epsilon (\beta + \alpha) /2} w^* + x_1 , w_0  \bigg\rangle - \eta \lVert x_1 \rVert^2
+= \bigg\langle \frac{2 b}{\epsilon (\beta + \alpha) /2} w^* + x_1 , w_0  \bigg\rangle - \eta \lVert x_1 \rVert^2
 $$
 $$
-\leq \bigg( \frac{2 \lVert w_0 \rVert}{\epsilon (\beta + \alpha) /2} \lVert w^* \rVert + \lVert x_1 \rVert \bigg ) \lVert w_0 \rVert - \eta \lVert x_1 \rVert^2
+\leq \bigg( \frac{2 b}{\epsilon (\beta + \alpha) /2} \lVert w^* \rVert + \lVert x_1 \rVert \bigg ) b - \eta \lVert x_1 \rVert^2
 $$
 $$
-= \frac{2 \lVert w_0 \rVert^2}{\epsilon (\beta + \alpha)/2} + \frac{2 \lVert w_0 \rVert ^2}{\epsilon \eta_{\min}} - \eta \frac{4 \lVert w_0 \rVert^2}{\epsilon^2 \eta_{\min}^2}
+\leq \frac{4 b ^2}{\epsilon \eta_{\min}} - \eta \frac{4 b^2}{\epsilon^2 \eta_{\min}^2}
 $$
 $$
-\leq \frac{4 \lVert w_0 \rVert^2}{\epsilon (\beta + \alpha)/2}  -  \frac{4 \lVert w_0 \rVert^2}{\epsilon^2 \eta_{\min}}
+\leq \frac{4 b^2}{\epsilon \eta_{\min}}  -  \frac{4 b^2}{\epsilon^2 \eta_{\min}}
 $$
 which is less than $0$ for $\epsilon < 1$, so $(x_2 , y_2)$ will cause the perceptron to update.
 
 Then,
-notice that $w_2 = w_0 +\eta \frac{2  \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2} w^*$
+notice that $w_2 = w_0 +\eta \frac{2  b}{\epsilon (\beta + \alpha)/2} w^*$
 
 Then 
 $$
-\frac{\langle w_2, w^* \rangle}{\lVert w_1 \rVert \lVert w^* \rVert} = \frac{
-\frac{\eta 2  \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2} \lVert w^* \lVert ^2 + \langle w_0, w^* \rangle}{\lVert w_2 \rVert}
+\frac{\langle w_2, w^* \rangle}{\lVert w_2 \rVert \lVert w^* \rVert} = \frac{
+\frac{\eta 2  b}{\epsilon (\beta + \alpha)/2} \lVert w^* \lVert ^2 + \langle w_0, w^* \rangle}{\lVert w_2 \rVert}
 $$ 
 $$
-\geq \frac{\frac{\eta 2  \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2} - \lVert w_0 \rVert}{\lVert w_0 \rVert +\frac{\eta 2  \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2} }
+\geq \frac{\frac{\eta 2  b}{\epsilon (\beta + \alpha)/2} - b}{b +\frac{\eta 2  \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2} }
 $$
 $$
-= 1 - \frac{2 \lVert w_0  \rVert}{\lVert w_0 \rVert +\frac{\eta 2  \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2} }
+= 1 - \frac{2 b}{b +\frac{\eta 2  b}{\epsilon (\beta + \alpha)/2} }
 $$
 $$
-= 1 - \frac{2\lVert w_0 \rVert}{\lVert w_0  \rVert \epsilon + \frac{\eta 2  \lVert w_0 \rVert}{(\beta + \alpha)/2} } \epsilon
+= 1 - \frac{2b}{b \epsilon + \frac{\eta 2  b}{(\beta + \alpha)/2} } \epsilon
 $$
 $$
-\geq  1 - \frac{2\lVert w_0 \rVert}{\lVert w_0  \rVert \epsilon + \frac{\eta 2  \lVert w_0 \rVert}{\eta_{\max} - (\beta - \alpha) / 2} } \epsilon
+\geq  1 - \frac{2b}{b \epsilon + \frac{\eta 2  b}{\eta_{\max} - (\beta - \alpha) / 2} } \epsilon
 $$
 $$
-\geq  1 - \frac{2\lVert w_0 \rVert}{\lVert w_0  \rVert \epsilon + \frac{\eta 2  \lVert w_0 \rVert}{\eta_{\max} (1-\epsilon)} } \epsilon
+\geq  1 - \frac{2b}{b \epsilon + \frac{\eta 2  b}{\eta_{\max} (1-\epsilon)} } \epsilon
 $$
 $$
-\geq 1 - \frac{2\lVert w_0 \rVert}{\lVert w_0  \rVert \epsilon + \frac{ 2  \lVert w_0 \rVert}{(1-\epsilon)} } \epsilon
+\geq 1 - \frac{2b}{b \epsilon + \frac{ 2  b}{(1-\epsilon)} } \epsilon
 $$
 $$
 \geq 1 - \epsilon
 $$
 
 Therefore 
-$T_\epsilon \leq  2 + \lceil \log_2 \frac{\eta_{\max} - \eta_{\min}}{2\epsilon\eta_{\max}}  \rceil$
+$\mathbb{T}_\epsilon \leq  2 + \lceil \log_2 \frac{\eta_{\max} - \eta_{\min}}{2\epsilon\eta_{\max}}  \rceil$
 
+\section{Teaching Dimension for unknown $\eta$ and $w_0$}
+Here we show a strategy where we know neither the learning rate or the initial weight vector of our perceptron learner. With prior knowledge of some reasonable bound on the magnitude of $w_0$ and $\eta$, we show a strategy that gives an upper bound on the approximate teaching dimension in this scenario.
+
+\textbf{Theorem 4.} 
+\textit{With unknown $w_0$ such that $\lVert w_0 \rVert \leq b < \infty$
+and unknown $\eta$ such that $0 < \eta_{\min} \leq \eta \leq \eta_{\max} < \infty$ then 
+$
+\mathbb{T}_\epsilon(w^* , \learn) \leq 3 + ?
+$
+}
+\\
+\\
+\\
+\textit{Proof.}
+First using \textbf{Algorithm 3} bound $\eta$ such that $ \alpha \leq \eta \leq \beta$ and $\beta - \alpha \leq 2\epsilon \eta_{\max}$
+
+Then WLOG assume $\lVert w^8 \rVert = 1$. Then pick an $x_1$ such that 
+$\lVert x_1 \rVert = \frac{2b}{\epsilon (\beta + \alpha)/2}$ and $\langle w^*, x_1 \rangle = 0$. Such an $x_1$ always exists. Then, let $x'_1 = -x_1.$ Then $y_1 = y'_1 = \text{sign}(\langle w*, x_1 \rangle) = -1$.  Then since $y_1 = y'_1$ then the perceptron must make an error on one of the examples. So first give $(x_1, y_1)$ to the perceptron.
+\underline{Case 1}: If $(x_1, y_1)$ then $w_1 = w_0 - \eta x_1$. 
+Then select at the second iteration an $x_2 = \frac{2b}{\epsilon (\beta + \alpha)/2}$. Using the same logic from theorem 2, we can see that this will give us our desired $\epsilon$ approximate $w_2$. 
+
+\underline{Case 2}: If $(x_1, y_1)$ did not cause and update then set $x_2 = x'_1$ , $y_2 = y'_1$ and $x_3 = \frac{2b}{\epsilon (\beta + \alpha)/2}w^* + x_2$. Using very similar logic to how Case 1 used Theorem 2, we can see that this will also get us the desired $\epsilon$ approximate $w_3$.
+
+In Case 1 we require 2 examples and and Case 2 we require 3, so including the examples needed to bound $\eta$ we get that 
+$$
+\mathbb{T}_\epsilon(w^*, \learn) \leq 3 + ?
+$$
+
+\subsection{Ability to Lie}
+Allowing the teacher to lie, or give $(x,y)$ that disagree with $w^*$, make teaching the learner very easy. In fact in this scenario, the approximate teaching dimension is $2$.
+\\
+\\
+\\
+\textbf{Theorem 5.} \textit{
+Let $w_0$, $\eta$ be unknown with $\lVert w_0 \rVert \leq b$ and $0 < \eta_{\min} \leq \eta$.
+Then with the ability to lie, $\mathbb{T}_{\epsilon}(w^*, \learn) = 2$
+}
+\\
+\\
+\\
+\textit{Proof.}
+WLOG assume $\lVert w^* \rVert = 1$
+Select an $x_1 = \frac{b(2-\epsilon)}{\eta_{\min} \epsilon}w^*, \qquad y_1 = -1$
+Then give $(x_1 , y _1)$ to the perceptron.
+Then let $x_2 = 2x_1, \qquad y_2 = 1$ and give $(x_2, y_2)$ to the perceptron.
+
+Then there are two cases.
+
+\textbf{Case 1:} The perceptron incorrectly predicts $y = 1$ for $x_1$.
+
+Then 
+$
+w_1 = w_0 - \frac{\eta b(2-\epsilon)}{\eta_{\min} \epsilon}w^*
+$
+
+Then 
+$$y_2 \langle w_1, 2x_1 \rangle
+$$
+$$
+ = \langle w_0, 2x_1 \rangle - 2\frac{(\eta b(2-\epsilon))^2}{(\eta_{\min}\epsilon)^2}
+ \leq 2b\frac{\eta b(2-\epsilon)}{\eta_{\min}\epsilon}
+-  2\frac{(\eta b(2-\epsilon))^2}{(\eta_{\min}\epsilon)^2} 
+$$
+$$
+\leq 2\frac{\eta b^2(2-\epsilon)}{\eta_{\min}\epsilon}
+-  2\frac{\eta (b(2-\epsilon))^2}{\eta_{\min}\epsilon^2}
+< 0 \qquad \text{ for } \epsilon < 0
+$$
+Therefore $(x_2, y_2)$ causes and update and
+$w_2 =  w_0 + \frac{\eta b(2-\epsilon)}{\eta_{\min} \epsilon}w^* $
+
+Then
+$$
+\frac{\langle w_2 , w^* \rangle}{\lVert w_2 \rVert \lVert w^* \rVert} = \frac{\frac{\eta b(2-\epsilon)}{\eta_{\min} \epsilon} + \langle w_0, w^* \rangle}{\lVert w_2 \rVert} \geq \frac{\frac{\eta b(2-\epsilon)}{\eta_{\min} \epsilon} - b}{b + \frac{\eta b(2-\epsilon)}{\eta_{\min} \epsilon}}
+$$
+Which implies
+$$
+1 - \frac{\langle w_2 , w^* \rangle}{\lVert w_2 \rVert \lVert w^* \rVert} \leq \frac{2b}{b + \frac{\eta b(2-\epsilon)}{\eta_{\min} \epsilon}}
+\leq
+\frac{2}{1 + \frac{2-\epsilon}{\epsilon}} = \epsilon
+$$
+
+\textbf{Case 2:} $(x_1, y_1)$ does not cause an update.
+
+Then clearly $(x_2, y_2)$ will cause an update and
+$$
+w_2 = w_0 + 2\frac{\eta b(2-\epsilon)}{\eta_{\min} \epsilon}w^* 
+$$
+so,
+$$
+\frac{\langle w_2 , w^* \rangle}{\lVert w_2 \rVert \lVert w^* \rVert} = 2\frac{\frac{\eta b(2-\epsilon)}{\eta_{\min} \epsilon} + \langle w_0, w^* \rangle}{\lVert w_2 \rVert} \geq \frac{\frac{\eta b(2-\epsilon)}{\eta_{\min} \epsilon} + \langle w_0, w^* \rangle}{\lVert w_2 \rVert} \geq 1 - \epsilon
+$$
+
+We have thus shown that we can get an $\epsilon$ approximate bound with only 2 examples. It should be clear that this is impossible to do with $1$ example since without knowledge of $w_0$ there exists no $(x_1, y_1)$ that can guarantee the perceptron will update.
+
+So 
+$
+\mathbb{T}_{\epsilon}(w^*, \learn) = 2
+$
+
+\textbf{Corrolary}
+\textit{
+Theorem 5 also shows that with known $\eta$ and ability to lie the approximate teaching dimension is still 2. This is 1 less the the $\epsilon$ approximate Teaching dimension where we cannot lie. \cite{perceptron}
+}
 
 \section*{References}
 
