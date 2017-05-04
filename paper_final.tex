@@ -51,15 +51,12 @@
 \end{abstract}
 
 \section{Introduction}
-====
-Mine
-
 In the real world, there are often scenarios where a teacher wishes to
 embed a desired concept within a learner. Sometimes, the teacher can only
 interact with the learner by providing the learner with a set of training examples.
 The task of creating the smallest possible set of examples that
 produces the desired concept in the learner is known as optimal teaching
-\cite{machine_teaching} \cite{teaching_dimension}. \cite{perceptron} looked for
+\cite{machine_teaching} \cite{teaching_dimension}\cite{td_linear}. It has applications in education and security \cite{security}\cite{education} \cite{poisoning}. \cite{perceptron} looked for
 the first time at optimal teaching in an online environment by proving the
 optimal teaching dimension in an online Perceptron. In this paper we look at the
 optimal teaching of the same perceptron, but with a teacher that also possess
@@ -76,16 +73,6 @@ linear decision boundary with mapping $x \to sign(\langle w, x \rangle)$, where
 $x \in \mathbb{R}^d$ is in the input space and $w \in \mathbb{R}^d$
 parameterizes the perceptron. Here, as in \cite{perceptron}, $sign(0) = -1$ for
 completeness. The learning algorithm for the online perceptron is seen below.
-
-====
-Yours
-
-There may be a scenario where one entity, or the \textit{teacher},  has a desired target concept and a learner in which the teacher wants to embed that concept. In this scenario the teacher can only interact with the learner by constructing and then giving the learner a set of training examples. This constructive task is known as optimal teaching \cite{machine_teaching} \cite{teaching_dimension}. It has applications in education and security \cite{security}\cite{education} \cite{poisoning}. \cite{perceptron}\cite{td_linear} looked for the first time at online teaching in an online environment, with an online perceptron. In this paper we look at optimal teaching of the same perceptron, but now we give the teacher the ability to use unlabeled examples. Unlabeled examples allow the teacher to probe to discover more about the learners current state while not changing the learner. We show that this new added ability allows the teacher to teach an online perceptron in a scenario, that before may have been difficult.
-
-The specific perceptron we are teaching is the  online perceptron \cite{perceptron_algo}. The algorithm is designed for a binary classification. It can learn any linear decision boundary,
-with mapping $x \to sign(\langle w, x \rangle)$ where $x \in \mathbb{R}^d$ comes from the input space and $w \in \mathbb{R}^d$ parameterizes the perceptron. Here , as in \cite{perceptron}, $sign(0) = -1$ for completeness. The learning algorithm for the online perceptron is seen below.
-
-====
 
 \begin{algorithm}
 \caption{Online Perceptron}
@@ -187,9 +174,7 @@ learning rate $\eta \in [\eta_{\min} , \eta_{\max}]$, then for given $\epsilon >
 
 \textit{Proof.}
 Assume $w_0 \neq cw^*$ for arbitrary $c > 0$, then there exists an $(x_1, y_1)$ such that $\text{sign}(\langle w^*,x_1 \rangle) = y_1 = -1$ and $\text{sign}(\langle w_0,x_1 \rangle) = -y_1$.
-\color{red}
-I don't think that its hard to show this is true. But I won't prove for now
-\color{black}
+
 
 Then give $(x_1, y_1)$ to the learner and then after training update,
 $$
@@ -202,9 +187,7 @@ and
 $$
 \langle w_0,x_2 \rangle - \frac{\eta_{\max} - \eta_{\min}}{2} \langle x_1, x_2 \rangle = 0
 $$
-\color{red}
-There should always be at least one solution to this. Again I won't prove for now.
-\color{black}
+There will always an $x_2$ with this property.
 
 
 Then probe the learner with $x_2$. If the learner outputs $-1$ then
@@ -295,59 +278,14 @@ our perceptron learner, in ? steps.
 Our algorithm will only consider the decision boundary and the weight vector of
 the Perceptron in two dimensions. In other words, we are considering the plane
 defined by
-\[
-  \begin{bmatrix}
-    a \\
-    b \\
-    0 \\
-    $\vdots$ \\
-    0
-  \end{bmatrix}
-  \textnormal{where}
-  \ a, b \in \textbb{R}
-\]
-\\
-\\
+
 In order to proceed, we must define an operation that creates an
 $\epsilon$-Bound around the angle of $w_o$ in the plane. It works by iteratively
 partitioning the plane with unlabeled examples. For convenience, let $(a,b)$
 denote a point in said plane. Let $ang(x,y)$ denote the angle between $x$ and
 $y$.
 
-\algnewcommand\algorithmicswitch{\textbf{switch}}
-\algnewcommand\algorithmiccase{\textbf{case}}
 
-\begin{algorithm}
-\caption{Bounding the angle of $w_0$}
-\begin{algorithmic}[1]
-	\REQUIRE $\epsilon$
-
-  \SWITCH{$sign(\langle w_0 , (0,1) \rangle)$, $sign(\langle w_0 , (1,0) \rangle)$}
-  \CASE
-  
-  \ENDCASE
-  \ENDSWITCH
-  \IF{$\alpha \leftarrow (1,0)$}  \ENDIF 
-  
-	\STATE Select $(x_1 , y_1)$ s.t. $sign(\langle w^* , x_1 \rangle) = y_1 = -1 = 
-	-sign(\langle w_0 , x_1 \rangle )$
-	\STATE Give $(x_1, y_1)$ to the perceptron and allow to update.
-	\STATE $\alpha \leftarrow \eta_{\min}$
-	\STATE $\beta \leftarrow \eta_{\max}$
-	
-	\WHILE{$\beta - \alpha > \epsilon$}
-		\STATE Select $ x_2$ s.t. $\langle w_0 , x_2 \rangle \neq 0, \langle x_1 , x_2 \rangle \neq 0$ and $\langle w_0, x_2 \rangle - \frac{\beta - \alpha}{2}\langle x_1, x_2 \rangle = 0$
-		\STATE Let the perceptron predict $\hat{y}$ for $x_2$
-		\IF{$\hat{y} = 1$}
-			\STATE $ \beta \leftarrow \frac{\beta - \alpha}{2}$ 		
-		\ELSE
-			\STATE $ \alpha \leftarrow \frac{\beta - \alpha}{2}$ 
-		\ENDIF	
-	\ENDWHILE   
-	\RETURN $(\alpha , \beta)$
-\end{algorithmic}
-\end{algorithm} 
-\textbf{textbf}
 
 \subsection{$\epsilon$-Bounding $\eta$}
 
