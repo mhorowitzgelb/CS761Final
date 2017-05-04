@@ -1,4 +1,4 @@
-   \documentclass{article}
+\documentclass{article}
 
 \usepackage[utf8]{inputenc} % allow utf-8 input
 \usepackage[T1]{fontenc}    % use 8-bit T1 fonts
@@ -37,14 +37,42 @@
 \maketitle
 
 \begin{abstract}
-  Optimal teaching is the task of constructing a special efficient training set, which when given to a learner teaches the desired concept inside the learners concept class. Before \cite{perceptron}, analysis of optimal teaching was only focused on batch learners. \cite{perceptron} looked at the optimal teaching strategy of an online Perceptron in two different scenarios with varying degrees of knowledge of the initial state of the learner. In this paper we show extensions of these scenarios where knowledge of the initial state is even more unknown.
+  Optimal teaching is the task of constructing an efficient training set
+  that teaches a learner some desired concept inside its concept class. Before
+  \cite{perceptron}, analysis of optimal teaching was only focused on batch
+  learners. \cite{perceptron} looked at the optimal teaching strategy of an
+  online Perceptron with varying degrees of knowledge of the initial state of
+  the learner. In this paper, we extend these results to environments where
+  there is even less knowledge of the Perceptron's initial state, but the
+  teacher is given extra powers to compensate. We present an efficient algorithm
+  to force the learner into a desired state with no knowledge of the learner's
+  initial state. We also analyze a setting in which a teacher has the ability to
+  lie.
 \end{abstract}
 
 \section{Introduction}
-There may be a scenario where one entity, or the \textit{teacher},  has a desired target concept and a learner in which the teacher wants to embed that concept. In this scenario the teacher can only interact with the learner by constructing and then giving the learner a set of training examples. This constructive task is known as optimal teaching \cite{machine_teaching} \cite{teaching_dimension}. \cite{perceptron} looked for the first time at online teaching in an online environment, with an online perceptron. In this paper we look at optimal teaching of the same perceptron, but now we give the teacher the ability to use unlabeled examples. Unlabeled examples allow the teacher to probe to discover more about the learners current state while not changing the learner. We show that this new added ability allows the teacher to teach an online perceptron in a scenario, that before may have been difficult.
+In the real world, there are often scenarios where a teacher wishes to
+embed a desired concept within a learner. Sometimes, the teacher can only
+interact with the learner by providing the learner with a set of training examples.
+The task of creating the smallest possible set of examples that
+produces the desired concept in the learner is known as optimal teaching
+\cite{machine_teaching} \cite{teaching_dimension}. \cite{perceptron} looked for
+the first time at optimal teaching in an online environment by proving the
+optimal teaching dimension in an online Perceptron. In this paper we look at the
+optimal teaching of the same perceptron, but with a teacher that also possess
+the ability to use unlabeled examples. An unlabeled example gives the teacher
+knowledge of the learner's prediction about that example without altering the
+learner's state. This is a reasonable power for any real-world teacher to
+posses. We show that this added ability allows the teacher to teach an
+online perceptron in a zero-knowledge scenario that otherwise would have been
+difficult.
 
-The specific perceptron we are teaching is the  online perceptron \cite{perceptron_algo}. The algorithm is designed for a binary classification. It can learn any linear decision boundary,
-with mapping $x \to sign(\langle w, x \rangle)$ where $x \in \mathbb{R}^d$ comes from the input space and $w \in \mathbb{R}^d$ parameterizes the perceptron. Here , as in \cite{perceptron}, $sign(0) = -1$ for completeness. The learning algorithm for the online perceptron is seen below.
+The specific perceptron we are teaching is the online perceptron
+designed for binary classification \cite{perceptron_algo}. It can learn any
+linear decision boundary with mapping $x \to sign(\langle w, x \rangle)$, where
+$x \in \mathbb{R}^d$ is in the input space and $w \in \mathbb{R}^d$
+parameterizes the perceptron. Here, as in \cite{perceptron}, $sign(0) = -1$ for
+completeness. The learning algorithm for the online perceptron is seen below.
 
 \begin{algorithm}
 \caption{Online Perceptron}
@@ -59,21 +87,26 @@ with mapping $x \to sign(\langle w, x \rangle)$ where $x \in \mathbb{R}^d$ comes
 \end{algorithmic}
 \end{algorithm}
 
-As one can see, knowledge of $w_0$ and $\eta$ are critical to being able to teach an online perceptron learner. \cite{perceptron} looked at teaching a perceptron with and without knowledge of $w_0$. Here we look at the situation when the learning rate $\eta$ is unknown. As well we look at the most challenging case, when both $w_0$ and $\eta$ are unknown at the start of teaching. 
+Because $w_0$ and $\eta$ affect the Perceptron's learning, knowledge of them is
+critical to being able to teach an online Perceptron learner. \cite{perceptron}
+looked at teaching a perceptron with, and without knowledge of $w_0$. Here we
+look at the situation where $w_0$ is known, but the learning rate $\eta$ is
+unknown. We also look at the most challenging case, when both $w_0$ and $\eta$
+are unknown at the start of teaching. 
 
 
 \section{Teaching Dimension}
 \cite{perceptron} used two metrics when analyzing their teaching strategies. The first was the exact 
-teaching dimension. The exact teaching dimension is the length of the shortest training sequence that 
-teaches a learner the desired concept. 
+teaching dimension: the length of the shortest training sequence that teaches a learner the desired concept. 
 
 \subsection{$TD_{exact}$}
 
 Formally, let $\mathbb{S}$ be the space of finite training 
 sequences. Then let $\mathcal{A}_{w_0}^{\eta} : \mathbb{S} \to \mathbb{R}^d$ be a function the gives the 
 resultant weight vector after training on a sequence in $\mathbb{S}$, where $w_0$ is the initial weight 
-vector, and $\eta$ is the learning rate. Then if the teacher which to teach a concept $w^*$, then since $w^*$ describes a linear decision boundary then for any $c > 0$, $cw^*$ is parameterizes the same concept as $w^*$
-so the exact teaching dimension is 
+vector, and $\eta$ is the learning rate. Then if the teacher which to teach a
+concept $w^*$, since $w^*$ describes a linear decision boundary for any $c > 0$,
+$cw^*$ is parameterizes the same concept as $w^*$. So the exact teaching dimension is 
 $$
 TD_{exact}(w^*, \mathcal{A}_{w_0}^\eta) = \min\{ \lvert S \rvert : 
 \mathcal{A}_{w_0}^\eta(S) = cw^* \text{ for some } c >0 \}
@@ -82,26 +115,26 @@ $$
 \cite{perceptron} showed that when $\eta$ and $w_0$ where known, $TD_{exact}(w^*, \mathcal{A}_{w_0}^\eta) = 1$
 
 \subsection{$TD_\epsilon$}
-\cite{perceptron} also defined an approximate teaching dimension for cases where the exact teaching dimension was infinite but one could approximately teach a concept within $\epsilon$ distance. For perceptrons, the distance metric used was simply the 1 minus the cosine angle between $w^*$ 
-and $\learn(S)$
+\cite{perceptron} also defined an approximate teaching dimension for cases where
+the exact teaching dimension was infinite, but one could approximately teach a concept within $\epsilon$ distance. For perceptrons, the distance metric used was simply the 1 minus the cosine angle between $w^*$ and $\learn(S)$
 $$
 1 -\frac{\langle \learn(S), w^* \rangle}{\lVert \learn(s) \rVert \lVert w^* \rVert} \leq \epsilon
 $$
 
-Then let $\mathbb{T}_\epsilon$ be the set of $\epsilon-\text{approximate}$ teaching strategies for a decision boundary $w^*$. Then
+Then let $\mathbb{T}_\epsilon$ be the set of $\epsilon$-approximate teaching strategies for a decision boundary $w^*$. Then
 $$
 TD_\epsilon(w^*, \learn) = \min_{t \in 
 \mathbb{T}_\epsilon} \max_{w_0 \in 
 \mathbb{R}^d} \lvert t(w_0) \rvert
 $$
 
-\cite{perceptron} showed that when $w_0$ was unknown but $\eta$ was known $TD_\epsilon(w^*, \learn) = 3$
+\cite{perceptron} showed that when $w_0$ was unknown but $\eta$ was known, $TD_\epsilon(w^*, \learn) = 3$
 
 \section{Approximate Teaching with Unkown $\eta$}
 Now we look at the scenario where the initial weight vector is known but the learning rate is unknown and bounded.
 
 \subsection{Using Unlabeled Examples}
-Before the teaching dimension was only analyzed with labeled examples. Here we relax this constraint and allow unlabeled examples to be used in the teaching sequence. Now we redefine $\mathbb{S}$ to be the set of all sequences of labeled and unlabeled examples. And for any $S \in \mathbb{S}$
+Before, the teaching dimension was only analyzed with labeled examples. Here we relax this constraint and allow unlabeled examples to be used in the teaching sequence. Now we redefine $\mathbb{S}$ to be the set of all sequences of labeled and unlabeled examples. And for any $S \in \mathbb{S}$
 $$
 \learn(S) = \learn(S \setminus \{s \in S : s = (x, ?)\} )
 $$
@@ -177,7 +210,6 @@ then $\mathbb{T}_{\epsilon}(w^*, \learn)  \leq 2 + \lceil \log_2 \frac{\eta_{\ma
 }
 \\
 \\
-\\
 \textit{Proof.}
 Assume WLOG $\lVert w^* \rVert = 1$.
 
@@ -243,8 +275,78 @@ Therefore
 $\mathbb{T}_\epsilon \leq  2 + \lceil \log_2 \frac{\eta_{\max} - \eta_{\min}}{2\epsilon\eta_{\max}}  \rceil$
 
 \section{Teaching Dimension for unknown $\eta$ and $w_0$}
-Here we show a strategy where we know neither the learning rate or the initial weight vector of our perceptron learner. With prior knowledge of some reasonable bound on the magnitude of $w_0$ and $\eta$, we show a strategy that gives an upper bound on the approximate teaching dimension in this scenario.
+Here we present an algorithm that teaches the desired concept to the Perceptron learner when we know neither the learning rate, nor the initial weight vector of
+our perceptron learner, in ? steps.
 
+\subsection{$\epsilon$-Bounding the angle of $w_0$}
+Our algorithm will only consider the decision boundary and the weight vector of
+the Perceptron in two dimensions. In other words, we are considering the plane
+defined by
+\[
+  \begin{bmatrix}
+    a \\
+    b \\
+    0 \\
+    $\vdots$ \\
+    0
+  \end{bmatrix}
+  \textnormal{where}
+  \ a, b \in \textbb{R}
+\]
+\\
+\\
+In order to proceed, we must define an operation that creates an
+$\epsilon$-Bound around the angle of $w_o$ in the plane. It works by iteratively
+partitioning the plane with unlabeled examples. For convenience, let $(a,b)$
+denote a point in said plane. Let $ang(x,y)$ denote the angle between $x$ and
+$y$.
+
+\algnewcommand\algorithmicswitch{\textbf{switch}}
+\algnewcommand\algorithmiccase{\textbf{case}}
+
+\begin{algorithm}
+\caption{Bounding the angle of $w_0$}
+\begin{algorithmic}[1]
+	\REQUIRE $\epsilon$
+
+  \SWITCH{$sign(\langle w_0 , (0,1) \rangle)$, $sign(\langle w_0 , (1,0) \rangle)$}
+  \CASE
+  
+  \ENDCASE
+  \ENDSWITCH
+  \IF{$\alpha \leftarrow (1,0)$}  \ENDIF 
+  
+	\STATE Select $(x_1 , y_1)$ s.t. $sign(\langle w^* , x_1 \rangle) = y_1 = -1 = 
+	-sign(\langle w_0 , x_1 \rangle )$
+	\STATE Give $(x_1, y_1)$ to the perceptron and allow to update.
+	\STATE $\alpha \leftarrow \eta_{\min}$
+	\STATE $\beta \leftarrow \eta_{\max}$
+	
+	\WHILE{$\beta - \alpha > \epsilon$}
+		\STATE Select $ x_2$ s.t. $\langle w_0 , x_2 \rangle \neq 0, \langle x_1 , x_2 \rangle \neq 0$ and $\langle w_0, x_2 \rangle - \frac{\beta - \alpha}{2}\langle x_1, x_2 \rangle = 0$
+		\STATE Let the perceptron predict $\hat{y}$ for $x_2$
+		\IF{$\hat{y} = 1$}
+			\STATE $ \beta \leftarrow \frac{\beta - \alpha}{2}$ 		
+		\ELSE
+			\STATE $ \alpha \leftarrow \frac{\beta - \alpha}{2}$ 
+		\ENDIF	
+	\ENDWHILE   
+	\RETURN $(\alpha , \beta)$
+\end{algorithmic}
+\end{algorithm} 
+\textbf{textbf}
+
+\subsection{$\epsilon$-Bounding $\eta$}
+
+Assume $\exists b, \eta_{min}, \eta_{max} \in \mathbb{R}$ such that $\lVert w_0
+\rVert \leq b < \infty$ and $0 < \eta_{\min} \leq \eta \leq \eta_{\max} <
+\infty$. 
+
+
+
+Now that we have a bound around $\eta$, we get to the main result.
+\\
+\\
 \textbf{Theorem 4.} 
 \textit{With unknown $w_0$ such that $\lVert w_0 \rVert \leq b < \infty$
 and unknown $\eta$ such that $0 < \eta_{\min} \leq \eta \leq \eta_{\max} < \infty$ then 
@@ -252,7 +354,6 @@ $
 \mathbb{T}_\epsilon(w^* , \learn) \leq 3 + ?
 $
 }
-\\
 \\
 \\
 \textit{Proof.}
@@ -274,12 +375,10 @@ $$
 Allowing the teacher to lie, or give $(x,y)$ that disagree with $w^*$, make teaching the learner very easy. In fact in this scenario, the approximate teaching dimension is $2$.
 \\
 \\
-\\
 \textbf{Theorem 5.} \textit{
 Let $w_0$, $\eta$ be unknown with $\lVert w_0 \rVert \leq b$ and $0 < \eta_{\min} \leq \eta$.
 Then with the ability to lie, $\mathbb{T}_{\epsilon}(w^*, \learn) = 2$
 }
-\\
 \\
 \\
 \textit{Proof.}
@@ -346,9 +445,6 @@ $
 \textit{
 Theorem 5 also shows that with known $\eta$ and ability to lie the approximate teaching dimension is still 2. This is 1 less the the $\epsilon$ approximate Teaching dimension where we cannot lie. \cite{perceptron}
 }
-
-\section*{References}
-
 
 
 \small
