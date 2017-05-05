@@ -14,6 +14,8 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{bbm}
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
 
 \setlength{\parskip}{5pt}
 \setlength{\parindent}{0pt}
@@ -287,77 +289,127 @@ $$
 Therefore 
 $\mathbb{T}_\epsilon \leq  2 + \lceil \log_2 \frac{\eta_{\max} - \eta_{\min}}{2\epsilon\eta_{\max}}  \rceil$
 
-\section{Teaching Dimension for unknown $\eta$ and $w_0$}
-Here we present an algorithm that teaches the desired concept to the Perceptron learner when we know neither the learning rate, nor the initial weight vector of
-our perceptron learner, in ? steps.
+\section{Discussions of the teaching dimension for unknown $\eta$ and $w_0$}
+
+We present an algorithm that teaches the desired concept to the Perceptron
+learner when we know neither the learning rate, nor the initial weight vector of
+our perceptron learner. The algorithm works well in general, but there is a very
+unlikely case that will cause the number of unsupervised queries to diverge to
+infinity. We also discuss a potential problem in the definition of the teaching
+dimension and prove an upper bound on the teaching dimension in this setting
+given an optimal algorithm for bounding $\eta$.
 
 \subsection{$\epsilon$-Bounding the angle of $w_0$}
 Our algorithm will only consider the decision boundary and the weight vector of
 the Perceptron in two dimensions. In other words, we are considering the plane
-defined by
+defined by,
 \[
   \begin{bmatrix}
-    a \\
-    b \\
-    0 \\
-    $\vdots$ \\
-    0
-  \end{bmatrix}
+    a & b & 0 & \cdots & 0
+  \end{bmatrix} ^ \top
   \textnormal{where}
-  \ a, b \in \textbb{R}
+  \ a, b \in \mathbb{R}
 \]
-\\
+The decision boundary of the Perceptron passes through the origin, so it will
+also pass through the origin of this plane and create a linear decision
+boundary.
 \\
 In order to proceed, we must define an operation that creates an
 $\epsilon$-Bound around the angle of $w_o$ in the plane. It works by iteratively
 partitioning the plane with unlabeled examples. For convenience, let $(a,b)$
 denote a point in said plane. Let $ang(x,y)$ denote the angle between $x$ and
-$y$.
-
-\algnewcommand\algorithmicswitch{\textbf{switch}}
-\algnewcommand\algorithmiccase{\textbf{case}}
+$y$. Let $mid(x, y)$ be the midpoint between $x$ and $y$ on the unit circle
+($x$ and $y$ have the same magnitude). Let $test(\alpha)$ be an unsupervised
+check of $\alpha$.
 
 \begin{algorithm}
 \caption{Bounding the angle of $w_0$}
 \begin{algorithmic}[1]
 	\REQUIRE $\epsilon$
+  \STATE Compute $test((0,1))$, $test((1,0))$, and $test((0,-1))$
 
-  \SWITCH{$sign(\langle w_0 , (0,1) \rangle)$, $sign(\langle w_0 , (1,0) \rangle)$}
-  \CASE
+  \COMMENT{One of these will be different from the others, or $w_0 \in
+  \{(1,0), (-1,0)\}$, in which case we're done.}
+  \STATE $\alpha \leftarrow $ the different one, $\beta \leftarrow $ the one
+  next to $\alpha$.
+  \FOR{$i \leftarrow \frac{1}{4}$; $i > \epsilon$; $ i \leftarrow \frac{i}{2}$}
+  \IF{$test(mid(\alpha,\beta)) \ != test(\alpha)$}
+  \STATE $\beta \leftarrow mid(\alpha, \beta)$
+  \ELSE
+  \STATE $\alpha \leftarrow mid(\alpha, \beta)$
+  \ENDIF
+  \ENDFOR
+  \RETURN $\alpha$, $\beta$
   
-  \ENDCASE
-  \ENDSWITCH
-  \IF{$\alpha \leftarrow (1,0)$}  \ENDIF 
-  
-	\STATE Select $(x_1 , y_1)$ s.t. $sign(\langle w^* , x_1 \rangle) = y_1 = -1 = 
-	-sign(\langle w_0 , x_1 \rangle )$
-	\STATE Give $(x_1, y_1)$ to the perceptron and allow to update.
-	\STATE $\alpha \leftarrow \eta_{\min}$
-	\STATE $\beta \leftarrow \eta_{\max}$
-	
-	\WHILE{$\beta - \alpha > \epsilon$}
-		\STATE Select $ x_2$ s.t. $\langle w_0 , x_2 \rangle \neq 0, \langle x_1 , x_2 \rangle \neq 0$ and $\langle w_0, x_2 \rangle - \frac{\beta - \alpha}{2}\langle x_1, x_2 \rangle = 0$
-		\STATE Let the perceptron predict $\hat{y}$ for $x_2$
-		\IF{$\hat{y} = 1$}
-			\STATE $ \beta \leftarrow \frac{\beta - \alpha}{2}$ 		
-		\ELSE
-			\STATE $ \alpha \leftarrow \frac{\beta - \alpha}{2}$ 
-		\ENDIF	
-	\ENDWHILE   
-	\RETURN $(\alpha , \beta)$
 \end{algorithmic}
-\end{algorithm} 
-\textbf{textbf}
+\end{algorithm}
+
+
+This gets us a bound around the angle of $w_0$ in time $\ceil{log(\frac{1}{\epsilon})} +
+1$.
+
 
 \subsection{$\epsilon$-Bounding $\eta$}
 
-Assume $\exists b, \eta_{min}, \eta_{max} \in \mathbb{R}$ such that $\lVert w_0
-\rVert \leq b < \infty$ and $0 < \eta_{\min} \leq \eta \leq \eta_{\max} <
-\infty$. 
+Now that we know that we can move and bound the angle of $w_0$, we can bound
+$\eta$. The algorithm works by giving the perceptron a ``large enough'' update,
+two times. Because the update is vector addition, the size of the update is a
+linear combination of $\eta$ and $\lVert w_0 \rVert$. With two equations and two
+unknowns, we can derive both $\eta$ and $\lVert w_0 \rVert$. Using basic trig,
+we get,
+
+\[
+  \begin{cases}
+    \lVert w_0 \rVert * \tan(\theta_1) + \eta * \lVert x \rVert (\tan(\theta_1)  
+    \cos{\phi} - \sin{\phi}) = 0 \\
+
+    \lVert w_0 \rVert * \tan(\theta_2) + \eta * 2 \lVert x \rVert (\tan(\theta_2)
+    \cos{\phi} - \sin{\phi}) = 0 \\
+  \end{cases}
+\]
+\textit{where $\theta_1, \theta_2$ are the angles of the updated $w$'s with
+  $w_0$, $\phi$ is the angle of the training case with $w_0$, and $x$ is our
+  training example.}
 
 
+\begin{algorithm}
+\caption{Bounding $\eta$}
+\begin{algorithmic}[1]
+	\REQUIRE $\epsilon'$: desired bound around the concept $w^*$
+  \STATE $\alpha_1, \beta,_1 \leftarrow$ bounds around $w_0$ such that $w^*$ is not
+  inside it
 
-Now that we have a bound around $\eta$, we get to the main result.
+  \COMMENT{If we detect that $ang(\alpha_1, \beta_1) < \epsilon'$, we can quit the
+    whole teaching procedure because the learner knows the concept.}
+  \STATE $x' \leftarrow $ the most perpendicular vector to $mid(\alpha_1, \beta_1)$
+  that causes an update
+  \STATE $v \leftarrow$ constant ``large enough'' to make the perceptron update
+  \STATE $teach(x' * v)$
+  \STATE $\alpha_2, \beta_2 \leftarrow$ ``small enough'' bound around $w$
+  \STATE $teach(x' * v)$
+  \STATE $\alpha_3, \beta_3 \leftarrow$ ``small enough'' bound around $w$
+  \STATE Solve the linear equation defined above 8 times using every combination of
+  $\alpha$ and $\beta$. The $\epsilon$-Bound is the worst case of these.
+\end{algorithmic}
+\end{algorithm}
+
+The problem with this algorithm appear in step 3; it is possible to come up with
+concrete definitions for Steps 2, 5, 7. We can construct a case where
+$\alpha_1$ and $\beta_1$ are as close as possible, without being $ < \epsilon'$,
+and $w^*$ is arbitrarily close to $\alpha$. This situation can require
+arbitrarily tight bounds on the angle of $w_0$, requiring arbitrarily many
+unsupervised queries.
+\subsection{Discussions of the Definition of Teaching Dimension}
+Given that the algorithm works well in general, but diverges in certain pathological
+cases, we suggest that an extension of the concept of the teaching dimension
+could be useful for dealing with Machine Teaching in more complex settings.
+Instead of Minmaxing the number of examples, we propose that the expected value
+of a teaching algorithm is a more interesting metric. There is a parallel to
+statistical learning theory: instead of using the ``minimax
+rule'' to minimize the Risk, it is better to minimize the expected Risk.
+
+
+\subsection{Main Result}
 \\
 \\
 \textbf{Theorem 4.} 
@@ -370,7 +422,7 @@ $
 \\
 \\
 \textit{Proof.}
-First using \textbf{Algorithm 3} bound $\eta$ such that $ \alpha \leq \eta \leq \beta$ and $\beta - \alpha \leq 2\epsilon \eta_{\max}$
+First using \textbf{Algorithm 4} bound $\eta$ such that $ \alpha \leq \eta \leq \beta$ and $\beta - \alpha \leq 2\epsilon \eta_{\max}$
 
 Then WLOG assume $\lVert w^8 \rVert = 1$. Then pick an $x_1$ such that 
 $\lVert x_1 \rVert = \frac{2b}{\epsilon (\beta + \alpha)/2}$ and $\langle w^*, x_1 \rangle = 0$. Such an $x_1$ always exists. Then, let $x'_1 = -x_1.$ Then $y_1 = y'_1 = \text{sign}(\langle w*, x_1 \rangle) = -1$.  Then since $y_1 = y'_1$ then the perceptron must make an error on one of the examples. So first give $(x_1, y_1)$ to the perceptron.
@@ -384,7 +436,7 @@ $$
 \mathbb{T}_\epsilon(w^*, \learn) \leq 3 + ?
 $$
 
-\subsection{Ability to Lie}
+\section{Ability to Lie}
 Allowing the teacher to lie, or give $(x,y)$ that disagree with $w^*$, make teaching the learner very easy. In fact in this scenario, the approximate teaching dimension is $2$.
 \\
 \\
