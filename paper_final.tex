@@ -44,9 +44,7 @@
   online Perceptron with varying degrees of knowledge of the initial state of
   the learner. In this paper, we extend these results to environments where
   there is even less knowledge of the Perceptron's initial state, but the
-  teacher is given extra powers to compensate. We present an efficient algorithm
-  to force the learner into a desired state with no knowledge of the learner's
-  initial state. We also analyze a setting in which a teacher has the ability to
+  teacher is given extra powers to compensate. We present two teaching strategies that take advantage of unlabeled examples to teach a perceptron. We also analyze a another strategy in which a teacher has the ability to
   lie.
 \end{abstract}
 
@@ -57,13 +55,12 @@ interact with the learner by providing the learner with a set of training exampl
 The task of creating the smallest possible set of examples that
 produces the desired concept in the learner is known as optimal teaching
 \cite{machine_teaching} \cite{teaching_dimension}\cite{td_linear}. It has applications in education and security \cite{security}\cite{education} \cite{poisoning}. \cite{perceptron} looked for
-the first time at optimal teaching in an online environment by proving the
-optimal teaching dimension in an online Perceptron. In this paper we look at the
+the first time at optimal teaching in an online environment by finding the teaching dimension of an online perceptron. In this paper we look at the
 optimal teaching of the same perceptron, but with a teacher that also possess
 the ability to use unlabeled examples. An unlabeled example gives the teacher
 knowledge of the learner's prediction about that example without altering the
 learner's state. This is a reasonable power for any real-world teacher to
-posses. We show that this added ability allows the teacher to teach an
+posses. We show that this added ability, with the exclusion of some worst case scenarios, allows the teacher to teach an
 online perceptron in a zero-knowledge scenario that otherwise would have been
 difficult.
 
@@ -94,28 +91,8 @@ look at the situation where $w_0$ is known, but the learning rate $\eta$ is
 unknown. We also look at the most challenging case, when both $w_0$ and $\eta$
 are unknown at the start of teaching. 
 
-
-\section{Teaching Dimension}
-\cite{perceptron} used two metrics when analyzing their teaching strategies. The first was the exact 
-teaching dimension: the length of the shortest training sequence that teaches a learner the desired concept. 
-
-\subsection{$TD_{exact}$}
-
-Formally, let $\mathbb{S}$ be the space of finite training 
-sequences. Then let $\mathcal{A}_{w_0}^{\eta} : \mathbb{S} \to \mathbb{R}^d$ be a function the gives the 
-resultant weight vector after training on a sequence in $\mathbb{S}$, where $w_0$ is the initial weight 
-vector, and $\eta$ is the learning rate. Then if the teacher which to teach a
-concept $w^*$, since $w^*$ describes a linear decision boundary for any $c > 0$,
-$cw^*$ is parameterizes the same concept as $w^*$. So the exact teaching dimension is 
-$$
-TD_{exact}(w^*, \mathcal{A}_{w_0}^\eta) = \min\{ \lvert S \rvert : 
-\mathcal{A}_{w_0}^\eta(S) = cw^* \text{ for some } c >0 \}
-$$
-
-\cite{perceptron} showed that when $\eta$ and $w_0$ where known, $TD_{exact}(w^*, \mathcal{A}_{w_0}^\eta) = 1$
-
-\subsection{$TD_\epsilon$}
-\cite{perceptron} also defined an approximate teaching dimension for cases where
+\section{Approximate Teaching Dimension}
+\cite{perceptron}  defined an approximate teaching dimension for cases where
 the exact teaching dimension was infinite, but one could approximately teach a concept within $\epsilon$ distance. For perceptrons, the distance metric used was simply the 1 minus the cosine angle between $w^*$ and $\learn(S)$
 $$
 1 -\frac{\langle \learn(S), w^* \rangle}{\lVert \learn(s) \rVert \lVert w^* \rVert} \leq \epsilon
@@ -127,7 +104,7 @@ TD_\epsilon(w^*, \learn) = \min_{t \in
 \mathbb{T}_\epsilon} \max_{w_0 \in 
 \mathbb{R}^d} \lvert t(w_0) \rvert
 $$
-
+where $\learn$ is the learning algorithm and $S$ is the training sequence. 
 \cite{perceptron} showed that when $w_0$ was unknown but $\eta$ was known, $TD_\epsilon(w^*, \learn) = 3$
 
 \section{Approximate Teaching with Unkown $\eta$}
@@ -201,7 +178,7 @@ $ 1 + \lceil \log_2 ( \frac{\eta_
 \subsection{Teaching Dimension for Unknown $\eta$}
 
 \textbf{Theorem 2.}
-\textit{ If $w_0$ is known , $w_0 \leq b < \infty$ and $ 0 < \eta_{\min} \leq \eta \leq \eta_{\max} < \infty$ 
+\textit{ If $w_0$ is known , $\lVert w_0 \rVert \leq b < \infty$ and $ 0 < \eta_{\min} \leq \eta \leq \eta_{\max} < \infty$ 
 then $\mathbb{T}_{\epsilon}(w^*, \learn)  \leq 2 + \lceil \log_2 \frac{\eta_{\max} - \eta_{\min}}{2\epsilon\eta_{\max}}  \rceil$
 }
 \\
@@ -211,7 +188,7 @@ Assume WLOG $\lVert w^* \rVert = 1$.
 
 Pick $(x_1,y_1)$ such that $y_1 = -1$, $\lVert x_1 \rVert = \frac{2 b}{\epsilon \eta_{\min}}$ and $\langle x_1 , w^* \rangle = 0$.
 
-Use this $(x_1, y_1)$ in \textbf{Algorithm 2} to get a bound on $\eta$ such that $\eta \in [\alpha , \beta]$ and $\beta - \alpha <= 2\epsilon \eta_{\max}$
+Use this $(x_1, y_1)$ in \textbf{Algorithm 2} to get a bound on $\eta$ such that $\eta \in [\alpha , \beta]$ and $\beta - \alpha \leq 2\epsilon \eta_{\max}$
 
 Then let $x_2 = \frac{2 b}{\epsilon (\beta + \alpha)/2}w^* + x_1$.
 It should be clear that then that $sign(\langle w* , x_2 \rangle) =  y_2 = 1$
@@ -222,17 +199,11 @@ $w_1 = w_0 - \eta x_1$
 So
 $$
 y_2 \langle w_1, x_2 \rangle  = \bigg\langle \frac{2 b}{\epsilon (\beta + \alpha) /2} w^* + x_1 , w_0 - \eta x_1 \bigg\rangle
-$$
-$$
 = \bigg\langle \frac{2 b}{\epsilon (\beta + \alpha) /2} w^* + x_1 , w_0  \bigg\rangle - \eta \lVert x_1 \rVert^2
 $$
 $$
 \leq \bigg( \frac{2 b}{\epsilon (\beta + \alpha) /2} \lVert w^* \rVert + \lVert x_1 \rVert \bigg ) b - \eta \lVert x_1 \rVert^2
-$$
-$$
 \leq \frac{4 b ^2}{\epsilon \eta_{\min}} - \eta \frac{4 b^2}{\epsilon^2 \eta_{\min}^2}
-$$
-$$
 \leq \frac{4 b^2}{\epsilon \eta_{\min}}  -  \frac{4 b^2}{\epsilon^2 \eta_{\min}}
 $$
 which is less than $0$ for $\epsilon < 1$, so $(x_2 , y_2)$ will cause the perceptron to update.
@@ -247,20 +218,12 @@ $$
 $$ 
 $$
 \geq \frac{\frac{\eta 2  b}{\epsilon (\beta + \alpha)/2} - b}{b +\frac{\eta 2  \lVert w_0 \rVert}{\epsilon (\beta + \alpha)/2} }
-$$
-$$
 = 1 - \frac{2 b}{b +\frac{\eta 2  b}{\epsilon (\beta + \alpha)/2} }
-$$
-$$
 = 1 - \frac{2b}{b \epsilon + \frac{\eta 2  b}{(\beta + \alpha)/2} } \epsilon
 $$
 $$
 \geq  1 - \frac{2b}{b \epsilon + \frac{\eta 2  b}{\eta_{\max} - (\beta - \alpha) / 2} } \epsilon
-$$
-$$
 \geq  1 - \frac{2b}{b \epsilon + \frac{\eta 2  b}{\eta_{\max} (1-\epsilon)} } \epsilon
-$$
-$$
 \geq 1 - \frac{2b}{b \epsilon + \frac{ 2  b}{(1-\epsilon)} } \epsilon
 $$
 $$
@@ -268,11 +231,14 @@ $$
 $$
 
 Therefore 
-$\mathbb{T}_\epsilon \leq  2 + \lceil \log_2 \frac{\eta_{\max} - \eta_{\min}}{2\epsilon\eta_{\max}}  \rceil$
+$\mathbb{T}_\epsilon(w^* ,\learn) \leq  2 + \lceil \log_2 \frac{\eta_{\max} - \eta_{\min}}{2\epsilon\eta_{\max}}  \rceil$
+
+\subsection{Tightness of Bound}
+We believe the bound in \textbf{Theorem 2} is tight. There are examples for which a single labeled example will not be able to guarantee our $\epsilon$ upper bound without a better bound on the learning rate. And we believe \textbf{Algorithm 2} is optimal for bounding the learning rate. Further work will need to be done to prove the tightness of \textbf{Theorem 2}.
 
 \section{Teaching Dimension for unknown $\eta$ and $w_0$}
 Here we present an algorithm that teaches the desired concept to the Perceptron learner when we know neither the learning rate, nor the initial weight vector of
-our perceptron learner, in ? steps.
+our perceptron learner.
 
 \subsection{$\epsilon$-Bounding the angle of $w_0$}
 Our algorithm will only consider the decision boundary and the weight vector of
@@ -302,24 +268,26 @@ Now that we have a bound around $\eta$, we get to the main result.
 \textit{With unknown $w_0$ such that $\lVert w_0 \rVert \leq b < \infty$
 and unknown $\eta$ such that $0 < \eta_{\min} \leq \eta \leq \eta_{\max} < \infty$ then 
 $
-\mathbb{T}_\epsilon(w^* , \learn) \leq 3 + ?
+\mathbb{T}_\epsilon(w^* , \learn) \leq 3 + T_{\text{bound}}(2\epsilon \eta_{\max})
 $
+where $T_{\text{bound}}(2\epsilon \eta_{\max})$ is the worst case number of examples needed to bound $\eta \in [\alpha , \beta]$ s.t. $\beta - \alpha \leq 2\epsilon \eta_{\max}$
 }
 \\
 \\
 \textit{Proof.}
-First using \textbf{Algorithm 3} bound $\eta$ such that $ \alpha \leq \eta \leq \beta$ and $\beta - \alpha \leq 2\epsilon \eta_{\max}$
+First bound $\eta$ such that $ \alpha \leq \eta \leq \beta$ and $\beta - \alpha \leq 2\epsilon \eta_{\max}$
 
-Then WLOG assume $\lVert w^8 \rVert = 1$. Then pick an $x_1$ such that 
+Then WLOG assume $\lVert w^* \rVert = 1$. Then pick an $x_1$ such that 
 $\lVert x_1 \rVert = \frac{2b}{\epsilon (\beta + \alpha)/2}$ and $\langle w^*, x_1 \rangle = 0$. Such an $x_1$ always exists. Then, let $x'_1 = -x_1.$ Then $y_1 = y'_1 = \text{sign}(\langle w*, x_1 \rangle) = -1$.  Then since $y_1 = y'_1$ then the perceptron must make an error on one of the examples. So first give $(x_1, y_1)$ to the perceptron.
-\underline{Case 1}: If $(x_1, y_1)$ then $w_1 = w_0 - \eta x_1$. 
+
+\underline{Case 1}: If $(x_1, y_1)$ causes an update then $w_1 = w_0 - \eta x_1$. 
 Then select at the second iteration an $x_2 = \frac{2b}{\epsilon (\beta + \alpha)/2}$. Using the same logic from theorem 2, we can see that this will give us our desired $\epsilon$ approximate $w_2$. 
 
 \underline{Case 2}: If $(x_1, y_1)$ did not cause and update then set $x_2 = x'_1$ , $y_2 = y'_1$ and $x_3 = \frac{2b}{\epsilon (\beta + \alpha)/2}w^* + x_2$. Using very similar logic to how Case 1 used Theorem 2, we can see that this will also get us the desired $\epsilon$ approximate $w_3$.
 
 In Case 1 we require 2 examples and and Case 2 we require 3, so including the examples needed to bound $\eta$ we get that 
 $$
-\mathbb{T}_\epsilon(w^*, \learn) \leq 3 + ?
+\mathbb{T}_\epsilon(w^*, \learn) \leq 3 + T_{\text{bound}}(2\epsilon \eta_{\max})
 $$
 
 \subsection{Ability to Lie}
@@ -340,7 +308,7 @@ Then let $x_2 = 2x_1, \qquad y_2 = 1$ and give $(x_2, y_2)$ to the perceptron.
 
 Then there are two cases.
 
-\textbf{Case 1:} The perceptron incorrectly predicts $y = 1$ for $x_1$.
+\underline{Case 1:} The perceptron incorrectly predicts $y = 1$ for $x_1$.
 
 Then 
 $
@@ -348,10 +316,10 @@ w_1 = w_0 - \frac{\eta b(2-\epsilon)}{\eta_{\min} \epsilon}w^*
 $
 
 Then 
-$$y_2 \langle w_1, 2x_1 \rangle
-$$
-$$
+$$y_2 \langle w_1, x_2 \rangle
  = \langle w_0, 2x_1 \rangle - 2\frac{(\eta b(2-\epsilon))^2}{(\eta_{\min}\epsilon)^2}
+$$
+$$
  \leq 2b\frac{\eta b(2-\epsilon)}{\eta_{\min}\epsilon}
 -  2\frac{(\eta b(2-\epsilon))^2}{(\eta_{\min}\epsilon)^2} 
 $$
@@ -374,7 +342,7 @@ $$
 \frac{2}{1 + \frac{2-\epsilon}{\epsilon}} = \epsilon
 $$
 
-\textbf{Case 2:} $(x_1, y_1)$ does not cause an update.
+\underline{Case 2:} $(x_1, y_1)$ does not cause an update.
 
 Then clearly $(x_2, y_2)$ will cause an update and
 $$
@@ -396,6 +364,9 @@ $
 \textit{
 Theorem 5 also shows that with known $\eta$ and ability to lie the approximate teaching dimension is still 2. This is 1 less the the $\epsilon$ approximate Teaching dimension where we cannot lie. \cite{perceptron}
 }
+
+\section{Conclusion}
+
 
 
 \small
