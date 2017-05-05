@@ -244,15 +244,13 @@ We present an algorithm that teaches the desired concept to the Perceptron
 learner when we know neither the learning rate, nor the initial weight vector of
 our perceptron learner. The algorithm works well in general, but there is a very
 unlikely case that will cause the number of unsupervised queries to diverge to
-infinity. We also discuss a potential problem in the definition of the teaching
+infinity. We also discuss a potential alteration to the definition of the teaching
 dimension and prove an upper bound on the teaching dimension in this setting
 given an optimal algorithm for bounding $\eta$.
 
 \subsection{$\epsilon$-Bounding the angle of $w_0$}
 Our algorithm will only consider the decision boundary and the weight vector of
-the Perceptron in two dimensions. In other words, we are considering the plane
-
-defined by,
+the Perceptron in two dimensions. In other words, we are considering the plane defined by,
 \[
   \begin{bmatrix}
     a & b & 0 & \cdots & 0
@@ -263,7 +261,6 @@ defined by,
 The decision boundary of the Perceptron passes through the origin, so it will
 also pass through the origin of this plane and create a linear decision
 boundary.
-\\
 
 In order to proceed, we must define an operation that creates an
 $\epsilon$-Bound around the angle of $w_o$ in the plane. It works by iteratively
@@ -462,7 +459,12 @@ Theorem 5 also shows that with known $\eta$ and ability to lie the approximate t
 }
 
 \section{Discussion}
-Here we've shown some interesting bounds. Though not all tight they still highlight some of the security risks of perceptrons. If a perceptron were used on a web-server, any of these algorithms would be efficient enough to hack the perceptron to believe whatever decision boundary we like. As well these findings highlight the power of lying in Machine Teaching. With the ability to lie, teaching a perceptron becomes trivial. One further venture would be to look into other learning algorithms that could be taught efficiently with lying. 
+Here we've shown some interesting bounds. Though they are not all tight, they
+still highlight some of the security risks of perceptrons. If a perceptron were
+used on a web-server, any of these algorithms would be efficient enough to hack
+the perceptron to believe whatever decision boundary we like. These findings
+also highlight the power of lying in Machine Teaching. With the ability to lie,
+teaching a perceptron becomes trivial. One extension would be to look into other learning algorithms that could be taught efficiently with lying. 
 
 
 \small
